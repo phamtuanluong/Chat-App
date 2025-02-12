@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { auth, listenMessages, sendMessage } from "../../firebase";
-import { Layout, List, Avatar, Typography, Button, Input } from "antd";
+import React, { useState, useEffect, useRef } from "react";
+import { auth, listenMessages } from "../../firebase";
+import { Layout, List, Avatar, Typography } from "antd";
 import { onAuthStateChanged } from "firebase/auth";
 import dayjs from "dayjs";
-import { SendOutlined } from "@ant-design/icons";
-
 
 const { Content } = Layout;
 const { Text } = Typography;
@@ -12,7 +10,7 @@ const { Text } = Typography;
 const Contents = () => {
     const [user, setUser] = useState(null);
     const [messages, setMessages] = useState([]);
-    const [text, setText] = useState("");
+    const messagesEndRef = useRef(null); // 🔹 Ref để cuộn xuống cuối danh sách
 
     useEffect(() => {
         // Kiểm tra trạng thái đăng nhập
@@ -21,13 +19,19 @@ const Contents = () => {
         });
 
         // Lắng nghe tin nhắn từ Firestore
-        const messages = listenMessages(setMessages);
+        const messagesListener = listenMessages(setMessages);
 
         return () => {
             logins();
-            messages();
+            messagesListener();
         };
     }, []);
+
+    useEffect(() => {
+        // 🔹 Cuộn xuống cuối danh sách khi có tin nhắn mới
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
+
     return (
         <Content style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "10px", overflowY: "auto" }}>
             <List
@@ -45,29 +49,7 @@ const Contents = () => {
                     </List.Item>
                 )}
             />
-            <Input
-                placeholder="Type a message..."
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                onPressEnter={() => {
-                    sendMessage(text, user);
-                    setText("");
-                }}
-                style={{
-                    position: "absolute",
-                    bottom: "60px",
-                    width: "1150px"
-                }}
-            />
-            <Button type="primary" icon={<SendOutlined />} style={{
-                position: "absolute",
-                bottom: "60px",
-                left: "1180px",
-                width: "40px"
-            }} onClick={() => {
-                sendMessage(text, user);
-                setText("");
-            }} />
+            <div ref={messagesEndRef} /> {/* 🔹 Thẻ ẩn giúp cuộn xuống */}
         </Content>
     );
 };

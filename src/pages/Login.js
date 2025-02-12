@@ -2,8 +2,7 @@ import React from "react";
 import { Button, Card } from "antd";
 import { GoogleOutlined } from "@ant-design/icons";
 import { signInWithGoogle } from "../firebase";
-import { Header } from "antd/es/layout/layout";
-import Footers from "../components/Footer";
+import { Footer, Header } from "antd/es/layout/layout";
 
 const Login = () => {
     return (
@@ -19,7 +18,14 @@ const Login = () => {
                     </Button>
                 </Card>
             </div>
-            <Footers />
+            <Footer style={{
+                padding: "10px 40px",
+                background: "#001529",
+                color: "#fff",
+                textAlign: "center"
+            }}>
+                Copyright 2025 by PhamTuanLuong
+            </Footer>
         </>
 
     );
